@@ -4,22 +4,21 @@
  * Dual licensed under the MIT or GPL Version 2 licenses. 
  * Usage: Check out the readme file or github.com/scottjehl/respond
 */
-(function( win, mqSupported ){
-	//exposed namespace
-	win.respond		= {};
+window.respond = (function( win, doc, mqSupported ){
+
+	var ret = {};
 	
 	//define update even in native-mq-supporting browsers, to avoid errors
-	respond.update	= function(){};
-	
+	ret.update	= function(){};
+
 	//expose media query support flag for external use
-	respond.mediaQueriesSupported	= mqSupported;
+	ret.mediaQueriesSupported	= mqSupported;
 	
 	//if media queries are supported, exit here
-	if( mqSupported ){ return; }
+	if( mqSupported ){ return ret; }
 	
 	//define vars
-	var doc 			= win.document,
-		docElem 		= doc.documentElement,
+	var docElem 		= doc.documentElement,
 		mediastyles		= [],
 		rules			= [],
 		appendedEls 	= [],
@@ -158,9 +157,9 @@
 		xmlHttp = (function() {
 			var xmlhttpmethod = false,
 				attempts = [
-					function(){ return new ActiveXObject("Microsoft.XMLHTTP") },
-					function(){ return new ActiveXObject("Msxml3.XMLHTTP") },
-					function(){ return new ActiveXObject("Msxml2.XMLHTTP") },
+					function(){ return new ActiveXObject("Microsoft.XMLHTTP"); },
+					function(){ return new ActiveXObject("Msxml3.XMLHTTP"); },
+					function(){ return new ActiveXObject("Msxml2.XMLHTTP"); },
 					function(){ return new XMLHttpRequest() }		
 				],
 				al = attempts.length;
@@ -183,7 +182,7 @@
 	ripCSS();
 	
 	//expose update for re-running respond later on
-	respond.update = ripCSS;
+	ret.update = ripCSS;
 	
 	//adjust on resize
 	function callMedia(){
@@ -195,9 +194,14 @@
 	else if( win.attachEvent ){
 		win.attachEvent( "onresize", callMedia );
 	}
+	
+	return ret;
+	
 })(
-	this,
-	(function( win ){
+	this,	
+	this.document,
+	
+	(function( win, doc ){
 		//cond. comm. IE check by James Padolsey
 		var ie = (function(undef){
  		    var v 	= 3,
@@ -213,8 +217,7 @@
 		//flag IE 8 and under as false - no test needed
 		if( ie && ie <= 8 ){ return false; }
 		//otherwise proceed with test
-		var doc		= win.document,
-			docElem	= doc.documentElement,
+		var docElem	= doc.documentElement,
 		    fb		= doc.createElement( "body" ),
 		    div		= doc.createElement( "div" ),
 		    se		= doc.createElement( "style" ),
@@ -235,5 +238,5 @@
 		docElem.removeChild( fb );
 		docElem.removeChild( se );
 		return support;
-	})( this )
+	})( this, this.document )
 );
